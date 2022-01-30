@@ -1,5 +1,8 @@
 package question3;
 
+import question3.tp3.Pile2;
+import question3.tp3.PileI;
+
 /**
  * Classe-test PileModeleTest.
  * 
@@ -24,45 +27,53 @@ package question3;
  *          engagements, et suivi d'un appel à tearDown(), qui les détruit.
  */
 public class PileModeleTest extends junit.framework.TestCase {
-	// Définissez ici les variables d'instance nécessaires à vos engagements;
-	// Vous pouvez également les saisir automatiquement du présentoir
-	// à l'aide du menu contextuel "Présentoir --> Engagements".
-	// Notez cependant que ce dernier ne peut saisir les objets primitifs
-	// du présentoir (les objets sans constructeur, comme int, float, etc.).
+    // Définissez ici les variables d'instance nécessaires à vos engagements;
+    // Vous pouvez également les saisir automatiquement du présentoir
+    // à l'aide du menu contextuel "Présentoir --> Engagements".
+    // Notez cependant que ce dernier ne peut saisir les objets primitifs
+    // du présentoir (les objets sans constructeur, comme int, float, etc.).
 
-	/**
-	 * Constructeur de la classe-test PileModeleTest
-	 */
-	public PileModeleTest() {
-	}
 
-	/**
-	 * Met en place les engagements.
-	 * 
-	 * Méthode appelée avant chaque appel de méthode de test.
-	 */
-	protected void setUp() // throws java.lang.Exception
-	{
-		// Initialisez ici vos engagements
+    public void setUp() {
+        
+    }
 
-	}
+    public void test_Pile_estPleine() throws Exception {
+        PileI p = new question3.PileModele<Integer>(new Pile2<Integer>(3));
+        p.empiler(3);
+        p.empiler(2);
+        p.empiler(1);
 
-	/**
-	 * Supprime les engagements
-	 * 
-	 * Méthode appelée après chaque appel de méthode de test.
-	 */
-	protected void tearDown() // throws java.lang.Exception
-	{
-		// Libérez ici les ressources engagées par setUp()
-	}
+        assertEquals(true, p.estPleine());
+        
+        try {
+            p.empiler(0);
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof question3.tp3.PilePleineException);
+        }
+    }
 
-	/**
-	 * Il ne vous reste plus qu'à définir une ou plusieurs méthodes de test. Ces
-	 * méthodes doivent vérifier les résultats attendus à l'aide d'assertions
-	 * assertTrue(<boolean>). Par convention, leurs noms devraient débuter par
-	 * "test". Vous pouvez ébaucher le corps grâce au menu contextuel
-	 * "Enregistrer une méthode de test".
-	 */
+    public void test_Pile_estVide() throws Exception {
+        PileI p = new question3.PileModele<Integer>(new Pile2<Integer>(3));
+        assertEquals(true, p.estVide());
+        try {
+            Object r = p.depiler();
+            fail();
+        } catch (Exception e) {
+            assertTrue(e instanceof question3.tp3.PileVideException);
+        }
+    }
+
+    public void test_Pile_toString() throws Exception {
+        PileI pile1 = new question3.PileModele<Integer>(new Pile2<Integer>(3));
+        assertEquals("toString incorrect ? ", "[]", pile1.toString());
+        pile1.empiler(4);
+        assertEquals("toString incorrect ? ", "[4]", pile1.toString());
+        pile1.empiler(5);
+        assertEquals("toString incorrect ? ", "[5, 4]", pile1.toString());
+        pile1.empiler(3);
+        assertEquals("toString incorrect ? ", "[3, 5, 4]", pile1.toString());
+    }
 
 }

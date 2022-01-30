@@ -1,18 +1,23 @@
 package question3;
 
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import question3.tp3.PileI;
 import question3.tp3.PilePleineException;
-import question3.tp3.PileVideException;
-
-import java.awt.*;
-import javax.swing.*;
-import java.awt.event.*;
 
 /**
- * Décrivez votre classe Controleur ici.
+ * D�crivez votre classe Controleur ici.
  * 
  * @author (votre nom)
- * @version (un numéro de version ou une date)
+ * @version (un num�ro de version ou une date)
  */
 public class Controleur extends JPanel {
 
@@ -34,31 +39,176 @@ public class Controleur extends JPanel {
 
         setLayout(new GridLayout(2, 1));
         add(donnee);
-        donnee.addActionListener(null /* null est à remplacer */);
+        ActionListener pushListener = new PushOperationListener(pile);
+        donnee.addActionListener(pushListener);
         JPanel boutons = new JPanel();
         boutons.setLayout(new FlowLayout());
-        boutons.add(push);  push.addActionListener(null /* null est à remplacer */);
-        boutons.add(add);   add.addActionListener(null /* null est à remplacer */);
-        boutons.add(sub);   sub.addActionListener(null /* null est à remplacer */);
-        boutons.add(mul);   mul.addActionListener(null /* null est à remplacer */);
-        boutons.add(div);   div.addActionListener(null /* null est à remplacer */);
-        boutons.add(clear); clear.addActionListener(null /* null est à remplacer */);
+        boutons.add(push);  push.addActionListener(pushListener);
+        boutons.add(add);   add.addActionListener(new AddOperationListener(pile));
+        boutons.add(sub);   sub.addActionListener(new SubstractOperationListener(pile));
+        boutons.add(mul);   mul.addActionListener(new MultiplyOperationListener(pile));
+        boutons.add(div);   div.addActionListener(new DivideOperationListener(pile));
+        boutons.add(clear); clear.addActionListener(new ClearOperationListener(pile));
         add(boutons);
         boutons.setBackground(Color.red);
         actualiserInterface();
     }
 
     public void actualiserInterface() {
-        // à compléter
+        if (pile.estVide()) {
+            add.setEnabled(false);
+            sub.setEnabled(false);
+            mul.setEnabled(false);
+            div.setEnabled(false);
+            clear.setEnabled(false);
+            push.setEnabled(true);
+            donnee.requestFocus();
+        } else if (pile.taille() == 1) {
+            add.setEnabled(false);
+            sub.setEnabled(false);
+            mul.setEnabled(false);
+            div.setEnabled(false);
+            clear.setEnabled(true);
+            push.setEnabled(true);
+        } else if (pile.estPleine()) {
+            push.setEnabled(false);
+        } else {
+            add.setEnabled(true);
+            sub.setEnabled(true);
+            mul.setEnabled(true);
+            div.setEnabled(true);
+            clear.setEnabled(true);
+            push.setEnabled(true);
+        }
     }
 
     private Integer operande() throws NumberFormatException {
         return Integer.parseInt(donnee.getText());
     }
 
-    // à compléter
-    // en cas d'exception comme division par zéro, 
-    // mauvais format de nombre suite à l'appel de la méthode operande
-    // la pile reste en l'état (intacte)
+    public class PushOperationListener implements ActionListener {
+
+        PileI<Integer> pile;
+
+        public PushOperationListener(PileI<Integer> pile) {
+            this.pile = pile;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            try {
+                pile.empiler(operande());
+                actualiserInterface();
+            } catch (NumberFormatException e) {
+                // e.printStackTrace();
+            } catch (PilePleineException e) {
+                // e.printStackTrace();
+            }
+        }
+    }
+
+    public class AddOperationListener implements ActionListener {
+
+        PileI<Integer> pile;
+
+        public AddOperationListener(PileI<Integer> pile) {
+            this.pile = pile;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            try {
+                pile.empiler(pile.depiler() + pile.depiler());
+                actualiserInterface();
+            } catch (Exception e) { 
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class SubstractOperationListener implements ActionListener {
+
+        PileI<Integer> pile;
+
+        public SubstractOperationListener(PileI<Integer> pile) {
+            this.pile = pile;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            try {
+                Integer i1 = pile.depiler();
+                Integer i2 = pile.depiler(); 
+                pile.empiler(i2 - i1);
+                actualiserInterface();
+            } catch (Exception e) { 
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class MultiplyOperationListener implements ActionListener {
+
+        PileI<Integer> pile;
+
+        public MultiplyOperationListener(PileI<Integer> pile) {
+            this.pile = pile;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            try {
+                pile.empiler(pile.depiler() * pile.depiler());
+                actualiserInterface();
+            } catch (Exception e) { 
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class DivideOperationListener implements ActionListener {
+
+        PileI<Integer> pile;
+
+        public DivideOperationListener(PileI<Integer> pile) {
+            this.pile = pile;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            
+            try {
+                if (pile.sommet() != 0) {
+                    Integer i1 = pile.depiler();
+                    Integer i2 = pile.depiler(); 
+                    pile.empiler(i2 / i1);
+                    actualiserInterface();
+                }
+            } catch (Exception e) { 
+                //e.printStackTrace();
+            }
+        }
+    }
+
+    private class ClearOperationListener implements ActionListener {
+
+        PileI<Integer> pile;
+
+        public ClearOperationListener(PileI<Integer> pile) {
+            this.pile = pile;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            try {   
+                while (!pile.estVide()) {
+                    pile.depiler();
+                }
+                actualiserInterface();
+            } catch (Exception e) { 
+               // e.printStackTrace();
+            }
+        }
+    }
 
 }

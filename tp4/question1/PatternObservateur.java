@@ -30,8 +30,17 @@ public class PatternObservateur extends junit.framework.TestCase {
         // vérifier que les deux observateurs ont bien été notifiés avec les
         // bons paramètres
 
-        // à compléter !!
-
+        assertFalse(o1.senders().empty());
+        assertFalse(o2.senders().empty());
+        assertEquals(l1, o1.senders().pop());
+        assertEquals(" 1 ", o1.arguments().pop());
+        assertEquals(l1, o2.senders().pop());
+        assertEquals(" 1 ", o2.arguments().pop());
+        assertEquals(l1, o1.senders().pop());
+        assertEquals("test", o1.arguments().pop());
+        assertEquals(l1, o2.senders().pop());
+        assertEquals("test", o2.arguments().pop());
+        
         // ne pas modifier ces lignes, dernières assertions vraies de cette
         // méthode
         assertTrue(o1.senders().empty() && o1.arguments().empty());
@@ -54,7 +63,16 @@ public class PatternObservateur extends junit.framework.TestCase {
         // à compléter à partir de la ligne 56
         // vérifier que l'observateur a bien été notifié par les deux listes
 
-        // à compléter !!
+        assertFalse(o.senders().empty());
+        assertFalse(o.arguments().empty());
+        assertEquals(l2, o.senders().pop());
+        assertEquals(" B ", o.arguments().pop());
+        assertEquals(l2, o.senders().pop());
+        assertEquals("testB", o.arguments().pop());
+        assertEquals(l1, o.senders().pop());
+        assertEquals(" A ", o.arguments().pop());
+        assertEquals(l1, o.senders().pop());
+        assertEquals("testA", o.arguments().pop());
 
         // ne pas modifier cette ligne, dernière assertion vraie de cette
         // méthode
@@ -76,14 +94,74 @@ public class PatternObservateur extends junit.framework.TestCase {
         // vérifier le bon fonctionnement de countObservers(), de deleteObserver
         // et deleteObservers()
 
-        // à compléter !!
-
+        assertEquals(2, l1.countObservers());
+        assertEquals(2, l2.countObservers());
+        l1.deleteObserver(o1);
+        assertEquals(1, l1.countObservers());
+        l2.deleteObserver(o2);
+        assertEquals(1, l2.countObservers());
+        l1.deleteObservers();
+        assertEquals(0, l1.countObservers());
+        l2.deleteObservers();
+        assertEquals(0, l2.countObservers());
+        
         // ne pas modifier ces lignes, dernières assertions vraies de cette
         // méthode
         assertTrue(o1.senders().empty());
         assertTrue(o2.senders().empty());
         assertTrue(l1.countObservers() == 0);
         assertTrue(l2.countObservers() == 0);
+    }
+    
+    public void test_OneSubjectToManyObservers() {
+        question1.ConcreteSubject s1 = new question1.ConcreteSubject();
+        question1.ConcreteObserver o1 = new question1.ConcreteObserver();
+        question1.ConcreteObserver o2 = new question1.ConcreteObserver();
+        question1.ConcreteObserver o3 = new question1.ConcreteObserver();
+        question1.ConcreteObserver o4 = new question1.ConcreteObserver();
+        question1.ConcreteObserver o5 = new question1.ConcreteObserver();
+        
+        s1.addObserver(o1);
+        s1.addObserver(o2);
+        s1.addObserver(o3);
+        s1.addObserver(o4);
+        s1.addObserver(o5);
+        
+        assertTrue(s1.countObservers() == 5);
+        
+        s1.insert("test message");
+        assertEquals("test message", o1.arguments().pop());
+        assertEquals("test message", o2.arguments().pop());
+        assertEquals("test message", o3.arguments().pop());
+        assertEquals("test message", o4.arguments().pop());
+        assertEquals("test message", o5.arguments().pop());
+    }
+    
+    public void test_ManySubjectsToOneObservers() {
+        question1.ConcreteSubject s1 = new question1.ConcreteSubject();
+        question1.ConcreteSubject s2 = new question1.ConcreteSubject();
+        question1.ConcreteSubject s3 = new question1.ConcreteSubject();
+        question1.ConcreteSubject s4 = new question1.ConcreteSubject();
+        question1.ConcreteObserver o1 = new question1.ConcreteObserver();
+        
+        s1.addObserver(o1);
+        s2.addObserver(o1);
+        s3.addObserver(o1);
+        s4.addObserver(o1);
+        
+        s1.insert("message1");
+        s2.insert("message2");
+        s3.insert("message3");
+        s4.insert("message4");
+        
+        assertEquals(s4, o1.senders().pop());
+        assertEquals("message4", o1.arguments().pop());
+        assertEquals(s3, o1.senders().pop());
+        assertEquals("message3", o1.arguments().pop());
+        assertEquals(s2, o1.senders().pop());
+        assertEquals("message2", o1.arguments().pop());
+        assertEquals(s1, o1.senders().pop());
+        assertEquals("message1", o1.arguments().pop());
     }
     
 }
